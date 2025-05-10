@@ -154,5 +154,51 @@ using System.Linq;
                 return NotFound("Book not found.");
             return Ok(book);
         }
+
+    // Get books by special category
+    [HttpGet("category/{categoryName}")]
+    public async Task<IActionResult> GetBooksByCategory(string categoryName, [FromQuery] BookQueryParameters query)
+    {
+        var books = _context.Books.AsQueryable();
+        var now = DateTime.Now;
+
+        books = categoryName.ToLower() switch
+        {
+            "bestsellers" => books.OrderByDescending(b => b.SoldCount),
+            "awardwinners" => books.Where(b => b.IsAwardWinner),
+            "newreleases" => books.Where(b => b.PublicationDate >= now.AddMonths(-3)),
+            "newarrivals" => books.Where(b => b.PublicationDate >= now.AddMonths(-1)),
+            "deals" => books.Where(b => b.IsOnSale &&
+                                       b.DiscountStartDate <= now &&
+                                       b.DiscountEndDate >= now),
+            "comingsoon" => books.Where(b => b.PublicationDate > now),
+            _ => books // "all" or unknown category
+        };
+
+        // Apply search if specified
+        if (!string.IsNullOrEmpty(query.Search))
+        {
+            books = books.Where(b =>
+                b.Title.ToLower().Contains(query.Search.ToLower()) ||
+                b.ISBN.ToLower().Contains(query.Search.ToLower()) ||
+                b.Description.ToLower().Contains(query.Search.ToLower()));
+        }
+
+        // Apply sorting
+        books = query.SortBy?.ToLower() switch
+        {
+            "price" => books.OrderBy(b => b.Price),
+            "popularity" => books.OrderByDescending(b => b.SoldCount),
+            "title" => books.OrderBy(b => b.Title),
+            "date" => books.OrderByDescending(b => b.PublicationDate),
+            _ => books.OrderBy(b => b.Title)
+        };
+
+        // Pagination
+        var skip = (query.Page - 1) * query.PageSize;
+        var result = await books.Skip(skip).Take(query.PageSize).ToListAsync();
+
+        return Ok(result);
     }
+}
 

@@ -16,5 +16,10 @@ namespace server1.Models
         public int Stock { get; set; }
         public int SoldCount { get; set; }
         public string ImageUrl { get; set; }
+        public bool IsAwardWinner { get; set; } = false; 
+        public bool IsOnSale { get; set; } = false; 
+        public decimal? DiscountPrice { get; set; } 
+        public DateTime? DiscountStartDate { get; set; } 
+        public DateTime? DiscountEndDate { get; set; } 
     }
 }
