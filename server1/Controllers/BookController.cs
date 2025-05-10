@@ -160,7 +160,7 @@ using System.Linq;
     public async Task<IActionResult> GetBooksByCategory(string categoryName, [FromQuery] BookQueryParameters query)
     {
         var books = _context.Books.AsQueryable();
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
 
         books = categoryName.ToLower() switch
         {
