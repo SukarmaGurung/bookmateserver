@@ -43,7 +43,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Add authorization services
 builder.Services.AddAuthorization();
 
+builder.Services.AddControllers().AddApplicationPart(typeof(BookController).Assembly);
+
+
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddScoped<CloudinaryService>();
 
 
 // Add controllers (API)
