@@ -1,4 +1,5 @@
 ﻿// Controllers/AuthController.cs
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -50,7 +51,7 @@ public class AuthController : ControllerBase
 
         if (login.Email == adminEmail && login.Password == adminPassword)
         {
-            return Ok(new { token = GenerateJwtToken("Admin", adminEmail, "Admin") });
+            return Ok(new { token = GenerateJwtToken("Admin", adminEmail, "Admin", id:0), role="Admin" });
         }
 
         // Member login
@@ -58,17 +59,18 @@ public class AuthController : ControllerBase
         if (user == null || !BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash))
             return Unauthorized("Invalid credentials.");
 
-        return Ok(new { token = GenerateJwtToken(user.FullName, user.Email, user.Role) });
+        return Ok(new { token = GenerateJwtToken(user.FullName, user.Email, user.Role, user.Id), role = user.Role, id = user.Id });
     }
 
 
-    private string GenerateJwtToken(string name, string email, string role)
+    private string GenerateJwtToken(string name, string email, string role, int id)
     {
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, name),
             new Claim(ClaimTypes.Email, email),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.Role, role),
+            new Claim(ClaimTypes.NameIdentifier, id.ToString())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

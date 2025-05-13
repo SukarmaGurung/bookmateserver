@@ -23,7 +23,7 @@ using System.Linq;
 
         // Admin: Create a book
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        
         public async Task<IActionResult> CreateBook([FromForm] BookDTO bookDto)
         {
             if (bookDto.Image == null)
