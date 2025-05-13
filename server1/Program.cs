@@ -50,6 +50,10 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 builder.Services.AddScoped<CloudinaryService>();
 
 
+// Add email services
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 // Add controllers (API)
 builder.Services.AddControllers();
 
