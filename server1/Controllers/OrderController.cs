@@ -24,7 +24,7 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OrderResponseDTO>> PlaceOrder()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = int.Parse( User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         var user = await _context.Users.FindAsync(userId);
         var cart = await _context.Carts
             .Include(c => c.Items)
@@ -132,7 +132,7 @@ public class OrderController : ControllerBase
         if (user?.Id != null)
         {
             var completedOrders = _context.Orders
-                .Count(o => int.Parse (o.UserId) == user.Id && o.Status == OrderStatus.Fulfilled);
+                .Count(o => o.UserId == user.Id && o.Status == OrderStatus.Fulfilled);
 
             if (completedOrders >= 10)
             {
