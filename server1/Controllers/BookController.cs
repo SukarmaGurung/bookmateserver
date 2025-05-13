@@ -200,5 +200,23 @@ using System.Linq;
 
         return Ok(result);
     }
+
+
+    [HttpPut("{id}/discount")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> SetDiscount(int id, [FromBody] DiscountDto dto)
+    {
+        var book = await _context.Books.FindAsync(id);
+        if (book == null) return NotFound();
+
+        book.IsOnSale = dto.IsOnSale;
+        book.DiscountPercentage = dto.DiscountPercentage;
+        book.DiscountStartTime = dto.DiscountStartTime;
+        book.DiscountEndTime = dto.DiscountEndTime;
+
+        await _context.SaveChangesAsync();
+        return Ok(book);
+    }
+
 }
 

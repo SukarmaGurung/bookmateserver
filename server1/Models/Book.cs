@@ -20,6 +20,18 @@ namespace server1.Models
         public bool IsOnSale { get; set; } = false; 
         public decimal? DiscountPrice { get; set; } 
         public DateTime? DiscountStartDate { get; set; } 
-        public DateTime? DiscountEndDate { get; set; } 
+        public DateTime? DiscountEndDate { get; set; }
+        public decimal? DiscountPercentage { get; internal set; }
+        public DateTime? DiscountStartTime { get; internal set; }
+        public DateTime? DiscountEndTime { get; internal set; }
+        public decimal GetCurrentPrice()
+        {
+            var now = DateTime.UtcNow;
+            if (IsOnSale && DiscountPercentage.HasValue && DiscountStartTime <= now && DiscountEndTime >= now)
+            {
+                return Price - (Price * DiscountPercentage.Value / 100);
+            }
+            return Price;
+        }
     }
 }
