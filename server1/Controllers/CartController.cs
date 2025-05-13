@@ -25,7 +25,7 @@ public class CartController : ControllerBase
         var cart = await _context.Carts
             .Include(c => c.Items)
             .ThenInclude(i => i.Book)
-            .FirstOrDefaultAsync(c => c.UserId == userId);
+            .FirstOrDefaultAsync(c => c.UserId == int.Parse( userId));
 
         if (cart == null) return Ok(new CartResponseDTO());
 
@@ -36,7 +36,7 @@ public class CartController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> AddToCart([FromBody] CartDTO cartDto)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = int.Parse( User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         var cart = await _context.Carts
             .Include(c => c.Items)
             .FirstOrDefaultAsync(c => c.UserId == userId) ?? new Cart { UserId = userId };
