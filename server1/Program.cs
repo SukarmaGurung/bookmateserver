@@ -50,6 +50,10 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 builder.Services.AddScoped<CloudinaryService>();
 
 
+// Add email services
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 // Add controllers (API)
 builder.Services.AddControllers();
 
@@ -84,6 +88,32 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    // Get the database context
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // Check if any categories exist
+    if (!dbContext.Categories.Any())
+    {
+        // Create the list of system categories
+        var systemCategories = new List<Category>
+        {
+            new Category { Name = "All Books", Description = "All available books", Type = "System" },
+            new Category { Name = "Bestsellers", Description = "Top selling books", Type = "System" },
+            new Category { Name = "Award Winners", Description = "Books that have won awards", Type = "System" },
+            new Category { Name = "New Releases", Description = "Books published in last 3 months", Type = "System" },
+            new Category { Name = "New Arrivals", Description = "Recently added books", Type = "System" },
+            new Category { Name = "Coming Soon", Description = "Upcoming books", Type = "System" },
+            new Category { Name = "Deals", Description = "Books on sale", Type = "System" }
+        };
+
+        // Add them to database
+        await dbContext.Categories.AddRangeAsync(systemCategories);
+        await dbContext.SaveChangesAsync();
+    }
+}
 
 // Enable CORS
 app.UseCors("AllowFrontend");
