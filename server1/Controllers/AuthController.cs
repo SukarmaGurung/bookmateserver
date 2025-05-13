@@ -44,6 +44,14 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(Login login)
     {
+        // Email must be a valid Gmail address
+        if (string.IsNullOrWhiteSpace(login.Email) || !login.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase))
+            return BadRequest("Email must be a valid Gmail address.");
+
+        // Password must be at least 7 characters
+        if (string.IsNullOrWhiteSpace(login.Password) || login.Password.Length < 7)
+            return BadRequest("Password must be at least 7 characters long.");
+
         // Admin login
         var adminEmail = _config["AdminCredentials:Email"];
         var adminPassword = _config["AdminCredentials:Password"];
@@ -60,6 +68,7 @@ public class AuthController : ControllerBase
 
         return Ok(new { token = GenerateJwtToken(user.FullName, user.Email, user.Role) });
     }
+
 
 
     private string GenerateJwtToken(string name, string email, string role)
