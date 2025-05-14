@@ -7,11 +7,26 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace server1.Migrations
 {
     /// <inheritdoc />
-    public partial class bookmate : Migration
+    public partial class AddAnnouncementFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Announcements",
+                columns: table => new
+                {
+                    AnnouncementID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Message = table.Column<string>(type: "text", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Announcements", x => x.AnnouncementID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Books",
                 columns: table => new
@@ -35,7 +50,10 @@ namespace server1.Migrations
                     IsOnSale = table.Column<bool>(type: "boolean", nullable: false),
                     DiscountPrice = table.Column<decimal>(type: "numeric", nullable: true),
                     DiscountStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DiscountEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    DiscountEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DiscountPercentage = table.Column<decimal>(type: "numeric", nullable: true),
+                    DiscountStartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DiscountEndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -194,6 +212,9 @@ namespace server1.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Announcements");
+
             migrationBuilder.DropTable(
                 name: "CartItem");
 

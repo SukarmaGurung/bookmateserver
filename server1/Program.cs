@@ -87,6 +87,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
+builder.Services.AddScoped<IAnnouncementService,AnnouncementService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
